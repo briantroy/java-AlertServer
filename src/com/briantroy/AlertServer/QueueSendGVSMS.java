@@ -12,9 +12,11 @@ import com.trendrr.beanstalk.BeanstalkException;
 import com.trendrr.beanstalk.BeanstalkJob;
 import com.trendrr.beanstalk.BeanstalkPool;
 
-import java.util.logging.*;
+
 import java.io.*;
 
+
+import org.apache.log4j.*;
 import org.json.*;
 
 /* Google Voice */
@@ -27,28 +29,14 @@ import com.techventus.server.voice.Voice;
 public class QueueSendGVSMS extends Thread{
 
 
-    private static Logger logger;
+    static org.apache.log4j.Logger myLog = org.apache.log4j.Logger.getLogger("com.briantroy.alertserver.main");
     private static Boolean isDone = false;
     private static ConfigFileReader cfrCfg;
 
-    static {
-        try {
-          boolean append = true;
-          FileHandler fh = new FileHandler("/usr/local/AlertServer/QueueSendGVSMS.log", append);
-          // FileHandler fh = new FileHandler(cfrCfg.getConfigItem("logfile"), append);
-          //fh.setFormatter(new XMLFormatter());
-          fh.setFormatter(new SimpleFormatter());
-          logger = Logger.getLogger("QueueSendGVSMS");
-          logger.addHandler(fh);
-        }
-        catch (IOException e) {
-          e.printStackTrace();
-        }
-    }
 
     public QueueSendGVSMS(ConfigFileReader cfg) {
         cfrCfg = cfg;
-        logger.info("Starting Google Voice Queue Worker...");
+        myLog.info("Starting Google Voice Queue Worker...");
     }
 
     public void isDone() {
@@ -64,7 +52,7 @@ public class QueueSendGVSMS extends Thread{
                 pooledQueue();
 
             } catch (BeanstalkException bsE) {
-                logger.severe(bsE.getMessage());
+                myLog.error(bsE.getMessage());
             }
         }
 
@@ -79,13 +67,13 @@ public class QueueSendGVSMS extends Thread{
             BeanstalkClient client = pool.getClient();
 
             BeanstalkJob job = client.reserve(10);
-            logger.info("Got job: " + job);
+            myLog.info("Got job: " + job);
             /*
              * Have to call the method here... need the client connection
              * to delete the job.
              */
             String jobBody = new String(job.getData());
-            logger.info("JSON From Queue: " + jobBody);
+            myLog.info("JSON From Queue: " + jobBody);
             try {
                 JSONObject iJob = new JSONObject(jobBody);
                 if(ClientMsg(iJob)) {
@@ -96,7 +84,7 @@ public class QueueSendGVSMS extends Thread{
                     client.close();
                 }
             } catch (JSONException e) {
-                logger.severe(e.getMessage());
+                myLog.error(e.getMessage());
                 client.close();
             }
 
@@ -124,9 +112,9 @@ public class QueueSendGVSMS extends Thread{
                             Voice gvThis = new Voice(cfrCfg.getConfigItem("google_user"), cfrCfg.getConfigItem("google_password"));
                             gvThis.sendSMS(thisMsg.getString("smsTo"), thisMsg.getString("imMsg"));
                         } catch (IOException e) {
-                            logger.severe(e.getMessage());
+                            myLog.error(e.getMessage());
                         } catch (JSONException jsE) {
-                            logger.severe(jsE.getMessage());
+                            myLog.error(jsE.getMessage());
                         }
 
 
@@ -135,7 +123,7 @@ public class QueueSendGVSMS extends Thread{
 
                        
                     } else {
-                        logger.severe("Asked to send an invalid message...");
+                        myLog.error("Asked to send an invalid message...");
                         return false;
                     }
 	}

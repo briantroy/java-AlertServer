@@ -11,11 +11,10 @@ import com.trendrr.beanstalk.BeanstalkException;
 import com.trendrr.beanstalk.BeanstalkJob;
 import com.trendrr.beanstalk.BeanstalkPool;
 
+import org.apache.log4j.*;
 import org.jivesoftware.smack.*;
 
-import java.util.logging.*;
 import java.io.*;
-
 import org.json.*;
 
 /* Google Voice */
@@ -30,25 +29,11 @@ import com.techventus.server.voice.Voice;
 public class QueueSendXMPP extends Thread {
 
     private static XMPPConnection tConn;
-    private static Logger logger;
     private static Boolean isDone = false;
     private static ConfigFileReader cfrCfg;
 
+    static org.apache.log4j.Logger myLog = org.apache.log4j.Logger.getLogger("com.briantroy.alertserver.main");
 
-    static {
-        try {
-          boolean append = true;
-          FileHandler fh = new FileHandler("/usr/local/AlertServer/QueueSendXMPP.log", append);
-          // FileHandler fh = new FileHandler(cfrCfg.getConfigItem("logfile"), append);
-          //fh.setFormatter(new XMLFormatter());
-          fh.setFormatter(new SimpleFormatter());
-          logger = Logger.getLogger("QueueSendXMPP");
-          logger.addHandler(fh);
-        }
-        catch (IOException e) {
-          e.printStackTrace();
-        }
-    }
 
     public QueueSendXMPP(XMPPConnection xConn, ConfigFileReader cfg) {
         tConn = xConn;
@@ -67,7 +52,7 @@ public class QueueSendXMPP extends Thread {
                 pooledQueue();
 
             } catch (BeanstalkException bsE) {
-                logger.severe(bsE.getMessage());
+                myLog.error(bsE.getMessage());
             }
         }
 
@@ -83,13 +68,13 @@ public class QueueSendXMPP extends Thread {
             BeanstalkClient client = pool.getClient();
             
             BeanstalkJob job = client.reserve(10);
-            logger.info("Got job: " + job);
+            myLog.info("Got job: " + job);
             /*
              * Have to call the method here... need the client connection
              * to delete the job.
              */
             String jobBody = new String(job.getData());
-            logger.info("JSON From Queue: " + jobBody);
+            myLog.info("JSON From Queue: " + jobBody);
             try {
                 JSONObject iJob = new JSONObject(jobBody);
                 if(ClientMsg(iJob)) {
@@ -100,7 +85,7 @@ public class QueueSendXMPP extends Thread {
                     client.close();
                 }
             } catch (JSONException e) {
-                logger.severe(e.getMessage());
+                myLog.error(e.getMessage());
                 client.close();
             }
             
@@ -128,15 +113,15 @@ public class QueueSendXMPP extends Thread {
                             } catch (XMPPException e) {
                                     // TODO Auto-generated catch block
                                     e.printStackTrace();
-                                    logger.severe(e.getMessage());
+                                    myLog.error(e.getMessage());
                                     return false;
                             }
                         } catch (JSONException e) {
-                            logger.severe(e.getMessage());
+                            myLog.error(e.getMessage());
                             return false;
                         }
                     } else {
-                        logger.severe("Asked to send an invalid message...");
+                        myLog.error("Asked to send an invalid message...");
                         return false;
                     }
 	}

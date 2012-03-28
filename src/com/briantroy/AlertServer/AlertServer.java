@@ -51,8 +51,6 @@ public class AlertServer {
 	final static String SSHDEFAULT = "no";
     final static String RESOURCEDEFAULT = "alert_worker";
 
-    private static Logger logger;
-
     static Logger myLog = Logger.getLogger("com.briantroy.alertserver.main");
 	
 	private static boolean runWorker(XMPPConnection imSvrConn, int intThisPort) {
