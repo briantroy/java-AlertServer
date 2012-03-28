@@ -1,12 +1,15 @@
 package com.briantroy.AlertServer;
 
 
+import org.apache.log4j.*;
 
 public class ConfigItems {
 	
 	public String[] strKey = new String[200];
 	public String[] strVal = new String[200];
 	private int intNumItems = 0;
+
+    static Logger myLog = Logger.getLogger("com.briantroy.alertserver.main");
 	
 	public String getConfigItem(String strThisKey) {
 		
@@ -73,6 +76,7 @@ public class ConfigItems {
 		
 		
 		if (i == cmdArgs.length){
+            myLog.info("No command line configuration supplied for AlertServer. Aborting...");
 			System.out.println(CONFMESSAGE);
 			blnGoodConfig = false;
 			return blnGoodConfig;

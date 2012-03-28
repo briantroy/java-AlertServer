@@ -5,10 +5,12 @@
 
 package com.briantroy.AlertServer;
 
+import org.apache.log4j.Category;
+
 import java.io.*;
 import java.util.Scanner;
 
-import java.util.logging.*;
+import org.apache.log4j.*;
 import java.util.ArrayList;
 
 /**
@@ -19,26 +21,13 @@ public class ConfigFileReader {
     ConfigItems tCfg;
 
     /*
-     * List of CofnigFileItem objects containing the KVP based
+     * List of ConfigFileItem objects containing the KVP based
      * config items found in the XML file.
      *
      */
     ArrayList<ConfigFileItem> cfgList = new ArrayList<ConfigFileItem>();
 
-    private static Logger logger;
-    static {
-        try {
-          boolean append = true;
-          FileHandler fh = new FileHandler("/usr/local/AlertServer/ConfigFileReader.log", append);
-          //fh.setFormatter(new XMLFormatter());
-          fh.setFormatter(new SimpleFormatter());
-          logger = Logger.getLogger("ConfigFileReader");
-          logger.addHandler(fh);
-        }
-        catch (IOException e) {
-          e.printStackTrace();
-        }
-    }
+    static Category myLog = Category.getInstance("main");
     /*
      * Constructor - takes a command line config items object.
      * If the -confFile item is set on command line get the file
@@ -53,11 +42,11 @@ public class ConfigFileReader {
         tCfg = cfg;
         try{
             loadConfig();
-            logger.info("Config File " + cfg.getConfigItem(AlertServer.CONFIGFILE) + " was read without errors.");
+            myLog.info("Config File " + cfg.getConfigItem(AlertServer.CONFIGFILE) + " was read without errors.");
             return true;
         } catch (FileNotFoundException fnE) {
-            logger.severe(fnE.getMessage());
-            logger.severe("The specified Configuraiton file: " + cfg.getConfigItem(AlertServer.CONFIGFILE) +
+            myLog.error(fnE.getMessage());
+            myLog.error("The specified Configuraiton file: " + cfg.getConfigItem(AlertServer.CONFIGFILE) +
                     "does not exist.");
             return false;
         }
@@ -71,11 +60,11 @@ public class ConfigFileReader {
         for(i=0; i<cfgList.size(); ++i) {
             ConfigFileItem c = cfgList.get(i);
             if(c.getName().equals(name)) {
-                logger.info("The value: " + c.getValue()+ " for configuration item: " + name + " was found.");
+                myLog.info("The value: " + c.getValue()+ " for configuration item: " + name + " was found.");
                 return c.getValue();
             }
         }
-        logger.info("The value for configuration item: " + name + " was not found.");
+        myLog.info("The value for configuration item: " + name + " was not found.");
         return ret;
 
     }
@@ -92,7 +81,7 @@ public class ConfigFileReader {
                 while(cScan.hasNextLine()) {
                     ConfigFileItem cNew = processLine(cScan.nextLine());
                     if(cNew != null) {
-                        logger.info("Found configuration item: " + cNew.getName() + " with value: " + cNew.getValue());
+                        myLog.info("Found configuration item: " + cNew.getName() + " with value: " + cNew.getValue());
                         cfgList.add(cNew);
                         ++j;
                     }

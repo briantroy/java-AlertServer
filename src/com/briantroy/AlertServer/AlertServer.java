@@ -13,7 +13,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.sql.Date;
 import java.lang.*;
-import java.util.logging.*;
+import org.apache.log4j.*;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.SSLXMPPConnection;
@@ -51,22 +51,9 @@ public class AlertServer {
 	final static String SSHDEFAULT = "no";
     final static String RESOURCEDEFAULT = "alert_worker";
 
-
     private static Logger logger;
 
-    static {
-        try {
-          boolean append = true;
-          FileHandler fh = new FileHandler("/usr/local/AlertServer/AlertServer.log", append);
-          //fh.setFormatter(new XMLFormatter());
-          fh.setFormatter(new SimpleFormatter());
-          logger = Logger.getLogger("AlertServer");
-          logger.addHandler(fh);
-        }
-        catch (IOException e) {
-          e.printStackTrace();
-        }
-    }
+    static Logger myLog = Logger.getLogger("com.briantroy.alertserver.main");
 	
 	private static boolean runWorker(XMPPConnection imSvrConn, int intThisPort) {
 		
@@ -80,7 +67,7 @@ public class AlertServer {
             ServerSocket sockServer = null;
             Socket newSock = null;
 
-            logger.info("Starting Client Connection Server... ");
+            myLog.info("Starting Client Connection Server... ");
 
             if(intThisPort == 0){//use default
                     intThisPort = PORT;
@@ -110,7 +97,7 @@ public class AlertServer {
                                     if(imSvrConn.isConnected()) {
                                         
                                     } else {
-                                        logger.info("Lost Connection to Jabber Server...");
+                                        myLog.info("Lost Connection to Jabber Server...");
                                         return false;
                                     }
                                     j += ".";
@@ -118,10 +105,10 @@ public class AlertServer {
                                         // This is every 10 segments of 30 seconds (5 mintues).
                                         if(m == 9) {
                                             // Print status
-                                            logger.info("Still connected to Jabber Server...");
+                                            myLog.info("Still connected to Jabber Server...");
                                             m = 0;
                                         } else {
-                                           // logger.info("This pass m = " + m);
+                                           // myLog.info("This pass m = " + m);
                                            ++m;
                                         }
                                         j = ".";
@@ -137,7 +124,7 @@ public class AlertServer {
 
                     if(seThis.getMessage().equals("Address already in use: JVM_Bind")){
                             //need to die...
-                            logger.severe("ERROR: Fatal Error in starting client listener.\n" +
+                            myLog.error("ERROR: Fatal Error in starting client listener.\n" +
                                             "Port: " + intThisPort + " already in use.\nExiting...");
                             //stop the asterisk call data thread.
 
@@ -145,7 +132,7 @@ public class AlertServer {
 
                     }
             } catch (IOException e) {
-                    logger.warning("IOException in runWorker: " + e.getMessage());
+                    myLog.warn("IOException in runWorker: " + e.getMessage());
                     e.printStackTrace(System.err);
 
             }
@@ -188,10 +175,10 @@ public class AlertServer {
                                         //end of message
 
                                         // handle the message here
-                                        logger.warning(strMessage[0]);
-                                        logger.warning(strMessage[1]);
-                                        logger.warning(strMessage[2]);
-                                        logger.warning(strMessage[3]);
+                                        myLog.warn(strMessage[0]);
+                                        myLog.warn(strMessage[1]);
+                                        myLog.warn(strMessage[2]);
+                                        myLog.warn(strMessage[3]);
                                         if(strMessage[0].equals(IMTO)) {
                                                 blnTO = true;
                                                 strTO = strMessage[1];
@@ -271,7 +258,7 @@ public class AlertServer {
                     iPort = 5222;
                     try {
 
-                            logger.info("Attempting Jabber Connnection to:\n" + "Server: " +
+                            myLog.info("Attempting Jabber Connnection to:\n" + "Server: " +
                                             cfg.getConfigItem(IMSVR) + "\nOn Port: " + iPort +
                                             "\nFor Domain: " + cfg.getConfigItem(IMDOMAIN));
                             XMPPConnection conn1 = new XMPPConnection(cfg.getConfigItem(IMSVR), iPort, cfg.getConfigItem(IMDOMAIN));
@@ -281,7 +268,7 @@ public class AlertServer {
 
                     } catch (XMPPException e) {
                             // TODO Auto-generated catch block
-                            logger.info("XMPPException Connecting to the server: " + e.getMessage());
+                            myLog.info("XMPPException Connecting to the server: " + e.getMessage());
                             return null;
                     }
             } else {
@@ -289,7 +276,7 @@ public class AlertServer {
                     try {
 //					 Create an SSL connection to jabber.org.
 
-                            logger.info("Attempting Jabber Connnection to:\n" + "Server: " +
+                            myLog.info("Attempting Jabber Connnection to:\n" + "Server: " +
                                             cfg.getConfigItem(IMSVR) + "\nOn Port: " + iPort +
                                             "\nFor Domain: " + cfg.getConfigItem(IMDOMAIN) + "\n");
                             XMPPConnection conn1 = new SSLXMPPConnection(cfg.getConfigItem(IMSVR), iPort, cfg.getConfigItem(IMDOMAIN));
@@ -298,7 +285,7 @@ public class AlertServer {
 
                     } catch (XMPPException e) {
                             // TODO Auto-generated catch block
-                            logger.severe("XMPPException Connecting to the server: " + e.getMessage());
+                            myLog.error("XMPPException Connecting to the server: " + e.getMessage());
                             e.printStackTrace();
                             return null;
                     }
@@ -333,7 +320,7 @@ public class AlertServer {
                         // This loop handles re-connect on XMPP Disconnect (runWorker will return false).
 
                         while(true) {
-                            logger.info("\n\n****************Starting AlertServer Threads now.***************");
+                            myLog.info("\n\n****************Starting AlertServer Threads now.***************");
                             finalMil = j*intSlMil;
                             try {
                                 Thread.sleep(finalMil);
@@ -350,25 +337,25 @@ public class AlertServer {
                                 if(conn1 != null || conn1.isConnected()) {
                                     
                                     // Good Connection
-                                    logger.info("Now Starting GVSMS");
+                                    myLog.info("Now Starting GVSMS");
                                     gvQueue.start();
-                                    logger.info("GVSMS should be running...");
+                                    myLog.info("GVSMS should be running...");
                                     thQueue.start();
-                                    logger.info("Starting the IP Socket XMPP Sender.");
+                                    myLog.info("Starting the IP Socket XMPP Sender.");
                                     runWorker(conn1,Integer.parseInt(cfgMyConfig.getConfigItem(LISTENPORT)));
                                     j = 1;
                                 } else {
-                                    logger.info("Stopping our queue worker threads...");
+                                    myLog.info("Stopping our queue worker threads...");
                                     if(gvQueue.isAlive()) gvQueue.isDone();
                                     if(thQueue.isAlive()) thQueue.isDone();
-                                    logger.info("Sleeping for a minute...\n\n");
+                                    myLog.info("Sleeping for a minute...\n\n");
                                     Thread.sleep(60000); // Wait 60 seconds for the threads to exit.
                                     ++j;
                                     if(j > 60) j = 60;
                                 }
                                 
                             } catch (InterruptedException e) {
-                                logger.severe("Caught Interruped Exception in main: " + e.getMessage());
+                                myLog.error("Caught Interruped Exception in main: " + e.getMessage());
 
                             }
 
@@ -377,7 +364,7 @@ public class AlertServer {
                         }
                     } else {
                         // Config file wasn't found.
-                        logger.severe("The specified configuration file was not found... aborting...");
+                        myLog.error("The specified configuration file was not found... aborting...");
                     }
                     
 			
