@@ -1,1 +1,0 @@
-/opt/SUNWappserver/jdk/jre/bin/java -classpath /usr/local/XMPP-Integration/smack-2.1.0/smack.jar:/usr/local/XMPP-Integration/XMPPWorker/ quickSend/ConnectSendXMPP -imSvr talk.google.com -imDomain brianandkelly.ws -imSSH yes -listenPort 3030 -imUser admin -imPasswd M@ggie01 > /usr/local/XMPP-Integration/google_xmppworker.log &

@@ -1,1 +1,0 @@
-/opt/SUNWappserver/jdk/jre/bin/java -classpath /usr/local/XMPP-Integration/smack-2.2.1/smack.jar:/usr/local/XMPP-Integration/XMPPWorker/ quickSend/ConnectSendXMPP -imSvr chat.brianandkelly.ws -imDomain chat.brianandkelly.ws -imSSH no -listenPort 3030 -imUser homepbx -imPasswd mypbx > /usr/local/XMPP-Integration/xmppworker.log &
