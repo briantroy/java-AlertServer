@@ -16,6 +16,8 @@ import com.trendrr.beanstalk.BeanstalkPool;
 import java.io.*;
 
 
+import org.apache.commons.logging.*;
+import org.apache.commons.logging.impl.SimpleLog;
 import org.apache.log4j.*;
 import org.json.*;
 
@@ -30,6 +32,7 @@ public class QueueSendGVSMS extends Thread{
 
 
     static org.apache.log4j.Logger myLog = org.apache.log4j.Logger.getLogger("com.briantroy.alertserver.main");
+    protected static Log log = LogFactory.getLog("gvsms_beanstalk_log");
     private static Boolean isDone = false;
     private static ConfigFileReader cfrCfg;
 
@@ -52,7 +55,7 @@ public class QueueSendGVSMS extends Thread{
                 pooledQueue();
 
             } catch (BeanstalkException bsE) {
-                myLog.error(bsE.getMessage());
+                if(bsE.getMessage() != "TIMED OUT") myLog.error(bsE.getMessage());
             }
         }
 

@@ -27,7 +27,7 @@ public class ConfigFileReader {
      */
     ArrayList<ConfigFileItem> cfgList = new ArrayList<ConfigFileItem>();
 
-    static Category myLog = Category.getInstance("main");
+    static org.apache.log4j.Logger myLog = org.apache.log4j.Logger.getLogger("main");
     /*
      * Constructor - takes a command line config items object.
      * If the -confFile item is set on command line get the file

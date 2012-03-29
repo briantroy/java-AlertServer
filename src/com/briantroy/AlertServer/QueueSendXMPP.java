@@ -11,8 +11,11 @@ import com.trendrr.beanstalk.BeanstalkException;
 import com.trendrr.beanstalk.BeanstalkJob;
 import com.trendrr.beanstalk.BeanstalkPool;
 
+import org.apache.commons.logging.impl.SimpleLog;
 import org.apache.log4j.*;
 import org.jivesoftware.smack.*;
+
+import org.apache.commons.logging.*;
 
 import java.io.*;
 import org.json.*;
@@ -33,7 +36,7 @@ public class QueueSendXMPP extends Thread {
     private static ConfigFileReader cfrCfg;
 
     static org.apache.log4j.Logger myLog = org.apache.log4j.Logger.getLogger("com.briantroy.alertserver.main");
-
+    protected static Log log = LogFactory.getLog("xmpp_beanstalk_log");
 
     public QueueSendXMPP(XMPPConnection xConn, ConfigFileReader cfg) {
         tConn = xConn;
@@ -52,7 +55,7 @@ public class QueueSendXMPP extends Thread {
                 pooledQueue();
 
             } catch (BeanstalkException bsE) {
-                myLog.error(bsE.getMessage());
+                if(bsE.getMessage() != "TIMED OUT") myLog.error(bsE.getMessage());
             }
         }
 
