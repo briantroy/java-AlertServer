@@ -27,16 +27,8 @@ public class ConfigFileReader {
      */
     ArrayList<ConfigFileItem> cfgList = new ArrayList<ConfigFileItem>();
 
-    static org.apache.log4j.Logger myLog = org.apache.log4j.Logger.getLogger("main");
-    /*
-     * Constructor - takes a command line config items object.
-     * If the -confFile item is set on command line get the file
-     * and parse it into the object.
-     */
+    static org.apache.log4j.Logger myLog = org.apache.log4j.Logger.getLogger("com.briantroy.alertserver.main");
 
-    public ConfigFileReader() {
-
-    }
 
     public Boolean fetchConfig(ConfigItems cfg) {
         tCfg = cfg;
@@ -46,7 +38,7 @@ public class ConfigFileReader {
             return true;
         } catch (FileNotFoundException fnE) {
             myLog.error(fnE.getMessage());
-            myLog.error("The specified Configuraiton file: " + cfg.getConfigItem(AlertServer.CONFIGFILE) +
+            myLog.error("The specified Configuration file: " + cfg.getConfigItem(AlertServer.CONFIGFILE) +
                     "does not exist.");
             return false;
         }
@@ -60,7 +52,7 @@ public class ConfigFileReader {
         for(i=0; i<cfgList.size(); ++i) {
             ConfigFileItem c = cfgList.get(i);
             if(c.getName().equals(name)) {
-                myLog.info("The value: " + c.getValue()+ " for configuration item: " + name + " was found.");
+                myLog.debug("The value: " + c.getValue()+ " for configuration item: " + name + " was found.");
                 return c.getValue();
             }
         }

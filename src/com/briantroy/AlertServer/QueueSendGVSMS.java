@@ -62,9 +62,10 @@ public class QueueSendGVSMS extends Thread{
     }
 
     private static void pooledQueue()  throws BeanstalkException {
-            BeanstalkPool pool = new BeanstalkPool(cfrCfg.getConfigItem("beanstalk_host"), Integer.valueOf(cfrCfg.getConfigItem("beanstalk_port")),
-                            30, //poolsize
-                    cfrCfg.getConfigItem("bs_queue_gvsms") //tube to use
+            BeanstalkPool pool = new BeanstalkPool(cfrCfg.getConfigItem("beanstalk_host"),
+                Integer.valueOf(cfrCfg.getConfigItem("beanstalk_port")),
+                30, //poolsize
+                cfrCfg.getConfigItem("bs_queue_gvsms") //tube to use
             );
 
             BeanstalkClient client = pool.getClient();
