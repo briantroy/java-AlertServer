@@ -63,14 +63,14 @@ public class QueueSendGVSMS extends Thread{
 
     private static void pooledQueue()  throws BeanstalkException {
             BeanstalkPool pool = new BeanstalkPool(cfrCfg.getConfigItem("beanstalk_host"),
-                Integer.valueOf(cfrCfg.getConfigItem("beanstalk_port")),
-                30, //poolsize
+                Integer.parseInt(cfrCfg.getConfigItem("beanstalk_port")),
+                Integer.parseInt(cfrCfg.getConfigItem("beanstalk_pool_size")), //poolsize
                 cfrCfg.getConfigItem("bs_queue_gvsms") //tube to use
             );
 
             BeanstalkClient client = pool.getClient();
 
-            BeanstalkJob job = client.reserve(10);
+            BeanstalkJob job = client.reserve(Integer.parseInt(cfrCfg.getConfigItem("beanstalk_reserve_timeout")));
             myLog.info("Got job: " + job);
             /*
              * Have to call the method here... need the client connection

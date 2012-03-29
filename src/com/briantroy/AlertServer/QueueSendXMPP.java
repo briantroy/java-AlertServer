@@ -63,14 +63,15 @@ public class QueueSendXMPP extends Thread {
     }
 
     private static void pooledQueue()  throws BeanstalkException {
-            BeanstalkPool pool = new BeanstalkPool(cfrCfg.getConfigItem("beanstalk_host"), Integer.valueOf(cfrCfg.getConfigItem("beanstalk_port")),
-                            30, //poolsize
-                    cfrCfg.getConfigItem("bs_queue_xmpp") //tube to use
+            BeanstalkPool pool = new BeanstalkPool(cfrCfg.getConfigItem("beanstalk_host"),
+                Integer.parseInt(cfrCfg.getConfigItem("beanstalk_port")),
+                Integer.parseInt(cfrCfg.getConfigItem("beanstalk_pool_size")), //poolsize
+                cfrCfg.getConfigItem("bs_queue_xmpp") //tube to use
             );
 
             BeanstalkClient client = pool.getClient();
             
-            BeanstalkJob job = client.reserve(10);
+            BeanstalkJob job = client.reserve(Integer.parseInt(cfrCfg.getConfigItem("beanstalk_reserve_timeout")));
             myLog.info("Got job: " + job);
             /*
              * Have to call the method here... need the client connection
