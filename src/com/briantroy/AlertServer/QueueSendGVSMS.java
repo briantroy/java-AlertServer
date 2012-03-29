@@ -25,27 +25,43 @@ import org.json.*;
 import com.techventus.server.voice.Voice;
 
 /**
+ * This class implements the beanstalkd worker thread for the alert server.
  *
- * @author brian.roy
+ * @author Brian Roy brian@briantroy.com
  */
 public class QueueSendGVSMS extends Thread{
 
-
+    /* log4j logger */
     static org.apache.log4j.Logger myLog = org.apache.log4j.Logger.getLogger("com.briantroy.alertserver.main");
+    /* May or may not be needed for the trendrr beanstalk library */
     protected static Log log = LogFactory.getLog("gvsms_beanstalk_log");
+
+
     private static Boolean isDone = false;
     private static ConfigFileReader cfrCfg;
 
-
+    /*
+    * Constructor...
+    *
+    * @param ConfigFileReader cfg The config object for the Alert Server
+    *
+     */
     public QueueSendGVSMS(ConfigFileReader cfg) {
         cfrCfg = cfg;
         myLog.info("Starting Google Voice Queue Worker...");
     }
 
+    /*
+    * Public method to allow the parent thread to gracefully stop this thread.
+    *
+     */
     public void isDone() {
         isDone = true;
     }
 
+    /*
+    * Run the thread.
+     */
     @Override
     public void run() {
 
@@ -61,6 +77,12 @@ public class QueueSendGVSMS extends Thread{
 
     }
 
+    /*
+    * Method pooledQueue establishes the Beanstalkd client and listens for jobs
+    * and handles them.
+    *
+    *
+     */
     private static void pooledQueue()  throws BeanstalkException {
             BeanstalkPool pool = new BeanstalkPool(cfrCfg.getConfigItem("beanstalk_host"),
                 Integer.parseInt(cfrCfg.getConfigItem("beanstalk_port")),
@@ -95,6 +117,12 @@ public class QueueSendGVSMS extends Thread{
 
     }
 
+    /*
+    * Method ClientMsg handles the individual message and sends it out.
+    *
+    * @param JSONObject thisMsg The JSON object representing the message.
+    * @return Boolean true on success, false if invalid message.
+     */
     private static boolean ClientMsg(JSONObject thisMsg) {
 
 		final int MAXMESSAGESIZE = 4;
@@ -109,7 +137,7 @@ public class QueueSendGVSMS extends Thread{
                     if(thisMsg.has("smsTo") && thisMsg.has("imMsg")) {
                         // Good message
                         
-                        /* Test sending a Goggle Voice SMS
+                        /* Sending a Goggle Voice SMS
                          *
                          */
                         try {
@@ -120,9 +148,6 @@ public class QueueSendGVSMS extends Thread{
                         } catch (JSONException jsE) {
                             myLog.error(jsE.getMessage());
                         }
-
-
-
                         return true;
 
                        

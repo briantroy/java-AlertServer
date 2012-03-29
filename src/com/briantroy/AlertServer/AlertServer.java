@@ -22,10 +22,20 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 
 
-
+/*
+* Main class for the AlertServer
+*
+* This contains the primary thread which starts the beanstalk threads and
+* the socket listener.
+*
+* @author: Brian Roy brian@briantroy.com
+*
+*/
 public class AlertServer {
 	
-	
+	/*
+	* Command Line Identifiers
+	*/
 	final static String IMTO = "-imTo";
 	
 	final static String IMMSG = "-imMsg";
@@ -41,7 +51,9 @@ public class AlertServer {
     final static String CONFIGFILE = "-configFile";
 
 	
-
+    /*
+    * Command Lind Defaults
+     */
 	final static String DEBUGDEFAULT = "no";
 	final static String NO = "no";
 	final static String YES = "yes";
@@ -51,8 +63,18 @@ public class AlertServer {
 	final static String SSHDEFAULT = "no";
     final static String RESOURCEDEFAULT = "alert_worker";
 
+    /*
+    * Log4J logger.
+     */
     static Logger myLog = Logger.getLogger("com.briantroy.alertserver.main");
-	
+
+
+	/*
+    * This method implements the socket listener to send XMPP messages.
+    *
+    * @param XMPPconnection imSrvConn The XMPP Server connection object.
+    * @param int intThisPort The port to listen on.
+	 */
 	private static boolean runWorker(XMPPConnection imSvrConn, int intThisPort) {
 		
             final int PORT = 2020;
@@ -84,14 +106,6 @@ public class AlertServer {
 
                             } catch (SocketTimeoutException steThis){
                                     //no biggie... continue
-                                    // just used to re-check blnOn to see if this thread should terminate.
-                                    /*
-                                    Presence presence = new Presence(Presence.Type.AVAILABLE);
-                                    presence.setStatus("Working" + j);
-                                    // Send the packet (assume we have a XMPPConnection instance called "con").
-                                    imSvrConn.sendPacket(presence);
-                                    */
-
                                     if(imSvrConn.isConnected()) {
                                         
                                     } else {
@@ -124,10 +138,6 @@ public class AlertServer {
                             //need to die...
                             myLog.error("ERROR: Fatal Error in starting client listener.\n" +
                                             "Port: " + intThisPort + " already in use.\nExiting...");
-                            //stop the asterisk call data thread.
-
-
-
                     }
             } catch (IOException e) {
                     myLog.warn("IOException in runWorker: " + e.getMessage());
@@ -138,13 +148,21 @@ public class AlertServer {
 
             return false;
 	}
+
+    /*
+    * The method ClientMsg handles messages received on the socket handler. These
+    * messages are sent using the XMPP Connection
+    *
+    * @param Socket mySocket The socket connection the message was found on
+    * @param XMPPconnection myConn The connection to the XMPP server that will be use to send the message.
+     */
 	
 	private static boolean ClientMsg(Socket mySock, XMPPConnection myConn) {
 		
 		final int MAXMESSAGESIZE = 4;
 		
 		final String CLIENTMAXMESSAGESIZEERROR = "Error 404 - exceeded maximum message size (4 lines)\n";
-		final String CLIENTMALFORMEDMSGERROR = "Error 405 - Message does not comply to specificaiton\n" +
+		final String CLIENTMALFORMEDMSGERROR = "Error 405 - Message does not comply to specification\n" +
 			"Message Format:\n" + "-imTo:\n<XMPP Address>\n-imMsg\n<Message Text>";
 		final String CLIENTMSGSENT = "200 - Message Sent - BYE";
 		
@@ -238,16 +256,21 @@ public class AlertServer {
                 } catch (SocketException exSock){
                         // Call Socket Exception Handler
                         exSock.printStackTrace();
-                        // TODO perform any local cleanup.
 
                 } catch (IOException e) {
-                        // TODO Clean Up Cch Block
                         e.printStackTrace();
                 }
 
 		
 		return false;
 	}
+
+    /*
+    * The method XMPPConnection establishes a connection to the XMPP server and returns the connection
+    * object.
+    *
+    * @param ConfigItems cfg The configuration for the alert server.
+     */
 
     public static XMPPConnection getXMPPConnection(ConfigItems cfg) {
             int iPort = 5222;
@@ -291,7 +314,13 @@ public class AlertServer {
 
             
         }
-	
+
+    /*
+    * main...
+    *
+    * @param String[] args The command line arguments.
+    *
+     */
 	public static void main(String[] args){
 
 		

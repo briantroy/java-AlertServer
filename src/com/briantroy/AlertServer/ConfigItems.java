@@ -3,14 +3,33 @@ package com.briantroy.AlertServer;
 
 import org.apache.log4j.*;
 
+/*
+* The ConfigItems class handles the command line options.
+*
+* @author Brian Roy brian@briantroy.com
+ */
+
 public class ConfigItems {
-	
+
+    /*
+    * Two arrays to handle the config items/keys.
+     */
 	public String[] strKey = new String[200];
 	public String[] strVal = new String[200];
 	private int intNumItems = 0;
 
+    /* Log4J logger */
     static Logger myLog = Logger.getLogger("com.briantroy.alertserver.main");
-	
+
+
+    /*
+    * The method getConfigItem returns the value of a given
+    * command line config parameter.
+    *
+    * @param String strThisKey The command line parameter to get value of.
+    *
+    * @return String The value of the command line config item or -1 if not found.
+     */
 	public String getConfigItem(String strThisKey) {
 		
 		
@@ -32,9 +51,8 @@ public class ConfigItems {
 	/**
 	 * Digests the commandline arguments into two like indexed 
 	 * public arrays. Also sets private fields in this object.
-	 * @param cmdArgs
-	 * @return
-	 * true on sucess, false on fail
+	 * @param cmdArgs String[] The array of command line elements.
+	 * @return Boolean true on success, false on fail
 	 */
 	public boolean digestCmdLine(String[] cmdArgs) {
 		
@@ -128,7 +146,7 @@ public class ConfigItems {
 			strKey[j] = AlertServer.IMDOMAIN;
 			strVal[j] = AlertServer.DOMAINDEFAULT;
 		}
-                if(!blnIMResource){
+        if(!blnIMResource){
 			++j;
 			strKey[j] = AlertServer.IMRESOURCE;
 			strVal[j] = AlertServer.RESOURCEDEFAULT;

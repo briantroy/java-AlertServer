@@ -1,6 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+*
+*
  */
 
 package com.briantroy.AlertServer;
@@ -25,8 +25,9 @@ import com.techventus.server.voice.Voice;
 
 
 /**
+ * This class implements the beanstalk queue worker for XMPP messages.
  *
- * @author brian.roy
+ * @author Brian Roy brian@briantroy.com
  */
 
 public class QueueSendXMPP extends Thread {
@@ -35,18 +36,32 @@ public class QueueSendXMPP extends Thread {
     private static Boolean isDone = false;
     private static ConfigFileReader cfrCfg;
 
+    /* log4j logger */
     static org.apache.log4j.Logger myLog = org.apache.log4j.Logger.getLogger("com.briantroy.alertserver.main");
+    /* may or may not be needed for trendrr beanstalkd library */
     protected static Log log = LogFactory.getLog("xmpp_beanstalk_log");
 
+    /*
+    * Constructor...
+    *
+    * @param XMPPConnection xConn Connection object to the xmpp server.
+    * @param ConfigFileReader cfg The AlertServer config object.
+     */
     public QueueSendXMPP(XMPPConnection xConn, ConfigFileReader cfg) {
         tConn = xConn;
         cfrCfg = cfg;
     }
 
+    /*
+    * The method isDone allows this thread to exit gracefully.
+     */
     public void isDone() {
         isDone = true;
     }
 
+    /*
+    * run...
+     */
     @Override
     public void run() {
         while(!isDone) {
@@ -62,6 +77,10 @@ public class QueueSendXMPP extends Thread {
 
     }
 
+    /*
+    * Method pooledQueue establishes the Beanstalkd client and listens for jobs
+    * and handles them.
+     */
     private static void pooledQueue()  throws BeanstalkException {
             BeanstalkPool pool = new BeanstalkPool(cfrCfg.getConfigItem("beanstalk_host"),
                 Integer.parseInt(cfrCfg.getConfigItem("beanstalk_port")),
@@ -95,7 +114,12 @@ public class QueueSendXMPP extends Thread {
             
             
     }
-
+    /*
+    * Method ClientMsg handles the individual message and sends it out.
+    *
+    * @param JSONObject thisMsg The JSON object representing the message.
+    * @return Boolean true on success, false if invalid message.
+     */
     private static boolean ClientMsg(JSONObject thisMsg) {
 
 		final int MAXMESSAGESIZE = 4;

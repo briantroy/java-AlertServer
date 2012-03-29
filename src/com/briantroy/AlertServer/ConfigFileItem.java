@@ -6,8 +6,9 @@
 package com.briantroy.AlertServer;
 
 /**
+ * This class is represents a configuration file item.
  *
- * @author brian.roy
+ * @author Brian Roy brian@briantroy.com
  */
 public class ConfigFileItem {
     /*
@@ -17,18 +18,27 @@ public class ConfigFileItem {
     private String property_name;
     private String property_value;
 
+    /*
+    Setter for Name
+     */
     public void setName(String n) {
         property_name = n;
     }
-
+    /*
+    Setter for Value
+     */
     public void setValue(String v) {
         property_value = v;
     }
-
+    /*
+    Getter for Name
+     */
     public String getName() {
         return property_name;
     }
-
+    /*
+    Getter for Value
+     */
     public String getValue() {
        return property_value;
     }
